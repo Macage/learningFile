@@ -1,0 +1,103 @@
+Django基础：
+
+配置Admin
+创建用户
+python manage.py createsuperuser 创建超级用户
+localhost:8000/admin/ Admin入口
+
+配合应用：
+在应用中admin.py中引入models
+
+修改数据
+点击Article超链接进入Article列表页面
+点击任意一条数据，进入编辑页面修改
+编辑页面下方一排按钮可执行相应操作
+
+修改数据默认显示名称
+步骤：
+在Article类下添加一个方法
+根据python3 选择__str__(self)
+return self.title
+
+博客页面设计
+页面概要：
+	博客主页面
+            文章标题列表，超链接
+	    发表博客按钮（超链接）
+	    列表编写思路：
+		取出数据库中所有文章对象
+		将文章对象们打包成列表，传递到前端
+		前端页面把文章以标题超链接的形式逐个列出
+	    模板for循环：
+		{% for xx in xxs %}
+		HTML语句
+		{% endfor %}
+	博客文章内容页面
+	    标题
+	    文章内容
+	    修改文章按钮（超链接）
+	    URL传递参数
+		参数写在响应函数中request后，可以有默认值
+		URL正则表达式：r'/article/(?P<article_id>[0-9+]/$)'
+		URL正则中的组名必须和参数名一致
+	Django中的超链接
+	    href后面是目标地址
+	    template中可以用"{% url 'app_name:url_name' param %}"
+	    其中app_name和url_name都在url中配置
+	再配URL：
+	     url函数的名称参数
+		根url，写在include（）的第二个参数位置，namespace=“blog”
+		应用下则写在url（）的第三个参数位置，name=“article”
+		主要取决于是否使用include引用了另一个url配置文件
+
+	博客撰写页面
+	    页面内容：
+		标题编辑栏
+		文章内容编辑区域
+		提交按钮
+	    编辑响应函数：
+		使用request.POST['参数名'] 获取表单数据
+		models.Article.objects.create(title,content)创建对象
+
+	两个编辑页面
+	    思路：
+		新文章为空，修改文章有内容
+		修改文章页面有文章对象
+		文章的ID
+	    修改数据：
+		article.title = title
+		article.save()
+
+
+补充内容：
+1.Templates过滤器
+（1）什么是过滤器？
+写在模板中，属于Django模板语言
+可以修改模板中的变量，从而显示不同的内容
+（2）怎么使用过滤器
+{{ value | filter }}
+eg:{{ list_nums | length }}
+过滤器可叠加。
+<input type="hidden" name="article_id" value="{{ article.id | default:'0' }}"/>
+可省略if，else
+
+2.django shell
+什么是Django Shell？
+它是一个python的交互式命令行程序
+它自动引入我们的交互环境
+如何使用python manage.py shell
+from blog.models import Article
+Article.objects.all()
+
+有什么用？
+我们可以使用django shell进行一些调试工作
+测试未知的方法
+
+3.admin
+创建admin配置类
+class ArticleAdmin(admin.ModelAdmin)
+注册：admin.site.register(Article,ArticleAdmin)
+
+显示其他字段
+list_display = ('title', 'content')
+

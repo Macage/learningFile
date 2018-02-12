@@ -1,0 +1,53 @@
+SQLAlchemy基础教程
+1.
+使用SQLAlchemy连接mysql数据库，创建一个博客应用所需要的数据表。
+使用SQLAlchemy进行简单的CURD操作及使用Faker生成测试数据。
+
+2.ORM
+ORM（object relational mapping）对象关系映射。
+ORM将数据库中的表与面向对象语言中的类建立一种对应关系。
+这样，我们要操作数据库，数据库中的表或者表中的一条记录就可以直接
+通过操作类或类实例来完成。
+
+3.SQLAlchemy就是python社区最知名的ORM工具之一。
+解决mysql，ERROR 1045(28000)
+#1.停止mysql数据库
+/etc/init.d/mysqld stop
+ 
+#2.执行如下命令
+mysqld_safe --user=mysql --skip-grant-tables --skip-networking &
+ 
+#3.使用root登录mysql数据库
+mysql -u root mysql
+ 
+#4.更新root密码
+mysql> UPDATE user SET Password=PASSWORD('newpassword') where USER='root';
+#最新版MySQL请采用如下SQL：
+mysql> UPDATE user SET authentication_string=PASSWORD('newpassword') where USER='root';
+ 
+#5.刷新权限 
+mysql> FLUSH PRIVILEGES;
+ 
+#6.退出mysql
+mysql> quit
+ 
+#7.重启mysql
+/etc/init.d/mysqld restart
+ 
+#8.使用root用户重新登录mysql
+mysql -uroot -p 
+Enter password: <输入新设的密码newpassword>
+
+
+4.简单CURD
+from sqlalchemy.orm import sessionmaker
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+
+
+
+
+
+

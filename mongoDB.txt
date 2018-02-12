@@ -1,0 +1,138 @@
+mongoDB：开源的NoSQL数据库
+互联网开发架构（LAMP）：Linux，Apache，MySQL，PHP。
+课程目的：
+1.熟悉MongoDB数据库各种概念。
+2.学会MongoDB的搭建。
+3.熟悉MongoDB的使用。
+4.简单运维。
+几个重要的网站：
+1.MongoDB官网：www.mongodb.org
+2.MongoDB国内官方网站：www.mongoing.com
+3.中文MongoDB文档地址：docs.mongoing.com
+4.MongoDB的github：https://github.com/mongodb/
+5.MongoDB的jira：https://jira.mongodb.org/
+6.两个google groups: mongodb-user与mongo-cn。
+
+一、MongoDB的概念：
+数据库概念：1.有组织地存放数据。2.按照不同的需求进行查询。
+数据库分类：1.sql数据库：支持sql语言的数据库。oracle，Mysql...
+                实时一致性、事务、多表联合查询
+            2.NoSql数据库：不支持sql语言的数据库。Redis，MongoDB
+                简单便捷、方便扩展、更好的性能
+MongoDB的特点：1.无数据结构限制：（1）没有表结构的概念，每条记录可以有完全不同的结构
+                                 （2）业务开发方便快捷
+                                 （3）sql数据库需要事先定义表结构再使用
+               2.完全的索引支持：（1）redis的key-value内存数据库，运行很快只提供一种查询方式，按键值查询
+                                 （2）hbase的单索引，二级索引需要自己实现。
+                                 （3）单建索引、多键索引、数组索引、全文索引、地理位置索引
+               3.方便的冗余和扩展（1）复制集保证数据安全
+                                 （2）分片扩展数据规模
+               4.良好的支持      （1）完善的文档
+                                 （2）齐全的驱动支持
+本课程相关的工具：
+MongoDB环境：64位linux
+MongoDB版本：2.6.5
+ssh工具：xshell
+文本编辑器：vim与notepad++
+1.MongoDB
+创建用户：
+（1）创建语法：createUser(2.6之前addUser)
+（2）{user:"<name>",
+      pwd:"<cleartext password>",
+      customData:{<any information>},
+      roles:[{role:"<role>",db:"<database>"}]}
+(3)角色类型：内建类型（read,readwrite,dbAdmin,dbOwner,userAdmin）
+2.mongo
+3.索引
+索引类型：
+_id索引
+单键索引
+多键索引
+复合索引
+过期索引
+全文索引
+地理位置索引
+
+索引的性质：
+	名字，name指定：
+		db.collection.ensureIndex({},{name:""})
+	唯一性，unique指定
+		db.collection.ensureIndex({},{unique:true/false})
+	稀疏性，sparse指定
+		db.collection.ensureIndex({},{sparse:true/false})
+	是否定时删除，expireAfterSeconds指定：
+		TTL，过期索引
+
+地理位置索引:
+2d索引：平面地理位置索引
+创建方式：db.collection.ensureIndex({w:"2d"})
+位置表示方式：经纬度[经度，维度]
+取值范围：经度[-180,180],维度[-90,90]
+查询方式：
+(1)$near查询：查询距离某个点最近的点；
+(2)$geoWithin查询：查询某个形状内的点。
+	1.$box:矩形，使用
+		{$box:[[<x1>,<y1>],[<x2>,<y2>]]}表示
+	2.$center:圆形，使用
+		{$center:[[<x1>,<y1>],r]}表示
+	3.$polygon,多边形，使用
+		{$polygon:[[<x1>,<y1>],[<x2>,<y2>],[<x3>,<y3>]]}表示
+(3)geoNear查询
+geoNear使用runCommand命令进行使用，常用使用如下：
+db.runCommand(
+{geoNear:<collection>,
+near:[x,y],
+minDistance:(对2d索引无效)
+maxDistance:
+num:
+})
+
+2dsphere索引：球面地理位置索引
+创建方式：db.collection.ensureIndex({w:"2dsphere"})
+位置表示方式：
+GeoJSON：描述一个点，一条直线，多边形等形状。
+格式：
+{type:"",coordinates:[<coordinates>]}
+
+支持$minDistance,$maxDistance
+
+索引优缺点：
+优点：加快索引相关的查询
+缺点：增加磁盘空间消耗，降低写入性能
+
+如何评判当前索引构建情况：
+1.mongostat工具介绍
+查看mongodb运行状态的程序
+使用说明：mongostat
+2.profile集合介绍
+3.日志介绍
+4.explain分析
+
+
+4.集合
+5.复制集
+6.分片
+7.数据均衡
+
+二、学会MongoDB的搭建
+1.部署数据库服务：
+ 搭建简单的单机服务
+ 搭建具有冗余容错功能的复制集
+ 搭建大规模数据集群
+ 完成集群的自动部署
+
+三、熟悉MongoDB的使用
+1.最基本的文档的读写更新删除
+2.各种不同类型的索引的创建与使用
+3.复杂的聚合查询
+4.对数据集合进行分片，在不同分片间维持数据均衡
+5.数据备份与恢复
+6.数据迁移
+
+四、简单运维
+1.部署MongoDB集群
+2.处理多种常见的故障
+ 单节点失效，如何恢复工作
+ 数据库意外被杀死如何进行数据恢复
+ 数据库发生拒绝服务时如何排查原因
+ 数据库磁盘快慢时如何处理

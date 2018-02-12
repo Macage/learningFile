@@ -1,0 +1,399 @@
+mysql学习基础课程：
+mysql目录结构：
+bin目录，存储可执行文件
+data目录，存储数据文件
+docs，文档
+include目录，存储包含的头文件
+lib目录，存储库文件
+share，错误消息和字符集文件
+
+mysql配置选项：
+修改编码方式：
+[mysql] default-character
+（一）修改mysql的提示符
+mysql -uroot -ppassword --prompt \h
+
+\* :提示符
+参数          描述
+\D           完整的日期
+\d           当前数据库
+\h           服务器名称
+\u           当前用户
+
+mysql常用命令
+select version();  显示当前服务器版本
+select now()； 显示当前日期时间
+
+
+mysql语句的规范：
+关键字与函数名称全部大写
+数据库名称、表名称、字段名称全部小写
+SQL语句必须以分号结尾
+
+创建数据库：
+create {database | schema} [if not exists] db_name
+[default] character set [=] charset_name
+
+查看当前服务器下的数据库列表：
+show {databases | schemas}
+[like 'pattern' | where expr]
+
+修改数据库：
+ALTER {DATABASES | SCHEMA} [db_name]
+[DEAFULT] CHARACTER SET [=] charset_name
+
+删除数据库：
+DROP {DATABASE | SCHEMA} [IF EXISTS] db_name
+
+
+数据类型：
+是指列、存储过程参数、表达式和局部变量的数据特征，它决定了数据的存储格式，
+代表了不同的信息类型。
+整型：  存储范围                        字节
+TINYINT:0-255                         1
+SMALLINT:0-65535                      2
+MEDIUMINT:0-16777215                  3
+INT:0-4294967295                      4
+BIGINT:0-2^64-1                       8
+
+浮点型：
+FLOAT[(M,D)]  :M是数字总位数，D是小数点后面的位数。如果M,D被省略，根据硬件允许的限制来保存值。
+单精度浮点数精确到大约7位小数位。
+DOUBLE[(M,D)]:
+
+日期时间型：
+year         1
+time         3
+date         3
+datetime     8
+timestamp（时间戳）    4
+
+字符型：
+CHAR(M)          M个字节，  0-M-255
+VARCHAR(M)       L+1个字节，L<= M且 0-65535
+TINYTEXT                   L-2^8
+TEXT                        2^16
+MEDIUMTEXT                 2^24
+LONGTEXT                   2^32
+ENUM('value1','value2',...)  2^64
+SET('value1'，'value2',...)   2^128
+
+创建数据表
+数据表（或称表）是数据库最重要的组成部分之一。
+打开数据库：USE DATABASES
+CREATE TABLE [IF NOT EXISTS] table_name(
+column_name data type,
+...)
+UNSIGNED：表示无负数。
+
+查看数据表：
+show tables[from db_name] [LIKE 'pattern' | where expr]
+show columns from tab_name:查看表的结构。
+
+插入数据记录：
+INSERT [INTO] tab_name [(col_name,...)] VALUES(val,...)
+记录查找：
+SELECT expr,... FROM tab1_name
+
+空值与非空：
+NULL,字段值可以为空
+NOT NULL,字段值禁止为空。非空约束
+
+AUTO_INCREMENT
+自动编号,且必须与主键组合使用
+默认情况下，起始值为1，每次的增量为1
+
+PRIMARY KEY
+主键约束，每张数据表只能存在一个主键；
+主键保证记录的唯一性，主键自动为NOT NULL。
+
+注意：auto_increment必须与primary key一起使用，但primary key可以单独使用。
+
+UNIQUE KEY
+唯一约束
+唯一约束可以保存记录的唯一性
+唯一约束的字段可以为空值（NULL）
+每张数据表可以存在多个唯一约束
+
+DEFAULT
+默认值
+当插入记录时，如果没有明确为字段赋值，则自动赋予默认值。
+
+约束：
+1.约束保证数据的完整性和一致性。
+2.约束分为表级约束和列级约束。
+3.约束类型包括：
+	NOT NULL（非空约束）
+	PRIMARY KEY（主键约束）
+	UNIQUE KEY(唯一约束)
+	DEFAULT(默认约束)
+	FOREIGN KEY（外键约束）
+FOREIGN KEYp
+foreign key (pid) references provinces (id)
+保持数据一致性，完整性
+实现一对一或一对多的关系。
+
+外键约束的要求：
+1.父表和子表必须使用相同的存储引擎，而且禁止使用临时表。
+2.数据表的存储引擎只能为InnoDB.
+3.外键列和参照列必须具有相似的数据类型。其中数据的长度或是否有符号
+位必须相同；而字符的长度则可以不同。
+4.外键列和参照列必须创建索引。如果外键列不存在索引的话，mysql将自动创建
+创建索引。
+
+编辑数据表的默认存储引擎
+mysql配置文件：
+default-storage-engine=InnoDB
+
+FOREIGN KEY外键约束的参照操作：
+1.CASCADE:从父表删除或更新且自动删除或更新子表中匹配的行。
+foreign key (pid) references provinces (id) on delete cascade
+2.SET NULL:从父表删除或更新行，并设置子表中的外键列为NULL。如果
+使用该选项，必须保证子表列没有指定NOT NULL。
+3.RESTRICT:拒绝对父表的删除或更新操作。
+4.NO ACTION:标准SQL的关键字，在MySQL中与RESTRICT相同。
+显示索引：
+show indexes from users\G;
+
+表级约束与列级约束：
+对一个数据列建立的约束，称为列级约束。
+对多个数据列建立的约束，称为表级约束。
+列级约束既可以在列定义时声明，也可以在列定义后声明。
+表级约束只能在列定义后声明。
+
+修改数据表：
+添加单列：
+alter table tb1_name add [column] col_name 
+column_definition [first | afrer col_name]
+alter table users1 add password varchar(32) not null after username;
+添加多列：
+alter table tb1_name add [column] (col_name column_deinition,...)
+删除列：
+alter table tb1_name drop col_name,drop col1_name
+alter table users1 drop password, drop age;
+添加主键约束：
+alter table tb1_name add [constraint [symbol]] primary key [index_type]
+(index_col_name,...)
+
+添加外键约束：
+alter table tb1_name add [constraint [symbol]] foreign key [index_name]
+(index_col_name,...) reference_definition
+
+添加/删除默认约束：
+alter table tb1_name alter [column] col_name
+{set default literal | drop default}
+
+删除主键约束：
+alter table tb1_name drop primary key
+
+删除唯一约束：
+alter table tb1_name drop {index|key} index_name
+
+删除外键约束：
+alter table tb1_name drop foreign key fk_symbol
+EX:alter table users2 drop foreign key users2_ibfk_1;
+
+修改列定义：
+alter table tb1_name modify [column] col_name column_defiinition [first | after col_name]
+
+修改列名称：
+alter table tb1_name change [column] old_col_name new_col_name column_definition
+[first | alter col_name]
+
+数据表更名：
+方法1：
+alter table tb1_name rename [TO|AS] new_tb1_name
+ex:alter table users2 rename users3;
+方法2：修改多个表的名字
+rename table tb1_name to new_tb1_name [,tb1_name2 to new_tb2_name2]...
+
+插入记录
+(1)INSERT [into] tb1_name [(col_name,...)] {values | values}
+(2)insert [into] tb1_name set col_name={expr |default},...
+说明：与第一种方式的区别在于，此方法可以使用子查询（subquery）
+(3)insert [into] tb1_name [(col_name,...)] select ...
+说明：此方法可以将查询结果插入到指定数据表。
+
+更新记录
+update
+单表更新:
+update [low_priority] [ignore] table_reference set col_name1={expr1|default} [,col_name2=
+expr|default] [where where_condition]
+
+删除操作：
+单表删除delete
+delete from tb1_name where [ where_condition]
+
+查找记录：
+select select_expr [,select_expr ...]
+[
+from table_references
+[where where_condition]
+[group by {col_name | position} [ASC|DESC],...]
+[having where_condition]
+[order by {col_name | expr | position} [ASC | DESC],...]
+[limit {[offset,] row_count | row_count OFFSET offset}]
+]
+查询表达式：select_expr
+1.每一个表达式表示想要的一列，必须有至少一个。
+2.多个列之间以英文逗号分隔。
+3.星号（*）表示所有列，tb1_name.* 可以表示命名表的所有列。
+4.查询表达式可以使用[AS] alias_name为其赋予别名。
+5.别名可用于GROUP BY, ORDER BY 或having子句。
+select users3.id,users3.username from users3;
+select id as userID,username as uname from users3; 
+select username,id from users3;
+select id username from users3;别名
+
+条件表示式：where
+对记录进行过滤，如果没有指定where子句，则显示所有记录。
+在where表达式中，可以使用mysql支持的函数或运算符。
+
+查询结果分组：group by
+[group by {col_name | position} [ASC|DESC]，...]
+
+分组条件：having
+[having where_condition]
+
+对查询结果进行排序：order by
+[order by {col_name | expr | position} [ASC|DESC],...]
+
+限制查询结果返回的数量：
+[limit {[offset,] row_count|row_count OFFSET offset}]
+
+子查询：subquery
+是指出现在其他SQL语句内的select子句。
+例如：
+select * from t1 where col1 = (select col2 from t2);
+其中select * from t1,称为Outer query
+select * from t2，称为subquery
+子查询指嵌套在查询内部，且必须使始终出现在圆括号（）内。
+子查询可以包含多个关键字或条件。
+如distinct，group by，order by，limit，函数等。
+子查询的外层查询可以是：select，insert，update，set或do。
+
+子查询返回值：
+子查询可以返回标量，一行，一列，或子查询。
+
+使用比较运算符的子查询：
+=、>、<、>=、<=、<>、!=、<=>
+语法结果
+operand comparison_operator subquery
+用any、some、all修饰的比较运算符。
+运算符     any     some     all
+> >=      最小值   最小值    最大值
+< <=      最大值   最大值    最小值
+=         任意值   任意值
+<> !=                        任意值
+
+使用[NOT] IN的子查询：
+语法结构：
+operand comparison_operator [not] in (subquery)
+=ANY
+使用[not] exists 的子查询
+如果子查询返回任何行，exists将返回true；否则为false。
+
+insert 。。。 select
+将查询结果写入数据表
+insert [into] tb1_name [(col_name,...)] select ...
+
+insert tdb_good_cates(cate_name) select goods_cate from tdb_goods group by 
+goods_cate;
+
+多表的更新：
+update table_references set col_name1={expr1|default}
+[,col_name2={expr2|default}]...
+[where where_condition]
+
+table_references
+create...select:
+创建数据表同时将查询结果写入到数据表
+create table [if not exists] tb1_name
+[(create_definition,...)]
+select_statement
+
+create table tdb_goods_brands(
+brand_id smallint unsigned primary key auto_increment,
+brand_name varchar(40) not null)
+select brand_name from tdb_goods group by brand_name;
+
+update tdb_goods inner as g join tdb_goods_brands as b on g.brand_name = b.brand_name
+set g.brand_name = b.brand_id;
+
+alter table tdb_goods change goods_cate cate_id smallint unsigned not null,
+change brands_name brand_id smallint unsigned not null;
+
+连接的语法结构：
+mysql在select语句、多表更新、多表逐句
+table_reference
+{[inner | cross] join | {left | right}[outer] join}
+table_reference
+on condition_expr
+
+数据表参照：
+table_inference
+tb1_name [[AS] alias] | table_subquery [AS] alias
+
+数据表可以使用tb1_name AS alias_name
+或 tb1_name alias_name 赋予别名
+table_subquery可以作为子查询使用。
+
+连接类型：
+1.join、cross join和inner join是等价的。显示左表及右表符合连接条件的记录。
+2.left[outer] join,左外连接。显示左表的全部记录及右表符合连接条件的记录。
+3.right [outer] join,右外连接。显示右表的全部记录及左表符合连接条件的记录。
+
+连接条件：
+使用ON关键字设定连接条件，也可以用where替代。
+1.通常使用ON 关键字来设定连接条件。
+2.使用WHERE关键字进行结果集记录的过滤。
+
+1.select goods_id,goods_name,cate_name from tdb_goods inner join tdb_goods_cate on 
+tdb_goods.cate_id = tdb_goods_cate.cate_id
+
+多表连接:
+select goods_id,goods_name,cate_name,brand_name,goods_price from tdb_goods as g 
+inner join tdb_goods_cates as c on g.cate_id = c.cate_id
+inner join tdb_goods_brand as b on g.brand_id = b.brand_id;
+
+连接说明：
+（1）外连接：A LEFT JOIN B join_condition
+数据表B的结果集依赖数据表A。
+数据表A的结果集根据左连接条件依赖所有数据表（B表除外）
+左外连接条件决定如何检索数据表B（在没有指定where条件的情况下）
+如果数据表A的某条记录符合where条件，但是在数据表B不存在符合连接条件的记录，将生成
+一个所有列为空的额外的B行。
+（2）如果使用内连接查找的记录在连接数据表中不存在，并且在where子句中尝试以下操作：
+col_namd IS NULL时，如果col_name被定义为not null，mysql将在找到符合连执着条件的记录
+后停止搜索更多的行。
+
+无线级分类表设计：
+select s.type_id,s.type_name,p.type_name from tdb_goods as s inner join
+tdb_goods_type as p on s.parent_id = p.type_id;
+
+select * from tdb_goods_types;
+
+select p.type_id,p.type_name,s.type_name from tdb_goods_types as p left
+join tdb_goods as s on p.type_id = s.parent_id group by p.type_name;
+order by p.type_id;
+
+自身连接
+多表删除：
+delete tb1_name[.*] [,tb1_name[.*]]...
+from table_references
+[where where_condition]
+
+select goods_id, goods_name from tdb_goods group by goods_name having
+count(goods_name) >= 2;
+
+delete t1 from tbd_goods as t1 left join (selct goods_id,goods_name
+ from tdb_goods group by goods_name having count(goods_name) >=2) as
+t2  on t1.goods_name = t2.goods_name where t1.goods_id > t2.goods_id;
+
+
+
+
+
+
+
+

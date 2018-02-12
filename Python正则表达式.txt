@@ -1,0 +1,96 @@
+一、正则表达式基本概念
+疑问：字符串匹配就可以实现？
+场景1：找到imooc开头的语句
+场景2：找到imooc开头和结尾的语句
+场景3：匹配一个下划线和字母开头的变量名
+1.正则表达式概念：使用单个字符串来描述匹配一系列符合某个句法规则的字符串。
+2.是对字符串操作的一种逻辑公式。
+3.应用场景：处理文本和数据
+4.正则表达式过程：依次拿出表达式和文本中的字符比较，如果每一个字符都能匹配，
+则匹配成功；否则失效。
+
+二、python正则表达式re模块
+1：import re
+re.compile（r‘imooc’）pattern.match('imooc python')
+'imooc'--->pattern -->match --.RESULT
+r 表示元字符串。
+提前生产pattern对象。
+三、正则表达式语法
+1.单个字符
+字符         语法
+.            匹配任意一个字符除了\n
+[...]        匹配字符集#re.match(r'{[...]}','{adc}')
+\d ，\D       匹配数字/非数字#re.match(r'{[\d]}','{1}')
+\s ，\S       匹配空白/非空白字符#re.match(r'{[\s]}','{ }')
+\w ，\W       匹配单词字符[a-zA-Z0-9]/非单词字符
+例子：re.match(r'{[\w]}','{a}')
+      re.match(r'\[[\w]\]','[a]')
+2.多个字符
+字符          语法
+*             匹配前一个字符0次或者无限次
++             匹配前一个字符1次或者无限次
+？            匹配前一个字符0次或者1次
+{m},{m,n}     匹配前一个字符m次或者m到n次
+*?,+?,??      匹配模式变为非贪婪（尽可能少匹配字符）
+例子：re.match(r'[A-Z][a-z]*','Assadsfdg')
+      re.match(r'[_a-zA-Z]+[_\w]*','Athis')
+      re.match(r'[1-9]?[0-9]','99')
+      re.match(r'[a-zA-Z0-9]{6}','abc123')
+      re.match(r'[a-zA-Z0-9]{6}@163.com','abc123@163.com')
+      re.match(r'[a-zA-Z0-9]{6,10}@163.com','abc123@163.com')
+      re.match(r'[0-9][a-z]*?','1bc')
+
+3.边界匹配
+字符             匹配
+^                匹配字符串开头
+$                匹配字符串结尾
+\A,\Z            指定的字符串匹配必须出现在开头或结尾
+例子：ma = re.match(r'^[\w]{4,10}@163.com$',' imooc@163.com')
+      ma = re.match(r'\Aimooc[\w]*','imoocpython')
+       
+4.分组匹配
+字符              匹配
+|                 匹配左右任意一个表达式              
+(ab)              括号中表达式作为一个分组
+\<number>         引用编号为num的分组匹配到的字符串
+(?p<name>)        分组起一个别名
+(?p=name)         引用别名为name的分组匹配字符串
+例子：ma = re.match(r'[1-9]?\d$','9')
+      ma = re.match(r'[1-9]?\d$|100','100')
+      ma = re.match(r'[\w]{4,6}@(163|126).com','imooc@163.com')
+      ma = re.match(r'<[\w]+>','<book>')
+      ma = re.match(r'<([\w]+>)\1','<book>')
+      ma = re.match(r'<([\w]+>)[\w]+</\1','<book>python</book>')
+      ma = re.match(r'<(?P<mark>[\w]+>)[\w]+</(?P=mark)','<book>python</book>')
+
+四、re模块相关方法实用
+1.search(pattern,string,flags=0) 在一个字符串中查找匹配
+str1 = 'imooc videonum = 10000'
+info = re.search(r'\d+',str1)
+
+2.findall(pattern,string,flags=0) 找到匹配，返回所有匹配部分的列表。
+str2 = 'c++ = 1000, java = 90, python = 80'
+info = re.search(r'\d+',str2)
+info = re.findall(r'\d+',str2)
+
+3.sub(pattern,repl,string,count=0,flags=0) 将字符串中匹配正则表达式的部分替换为其他值
+str3 = 'imooc videonum=1000'
+info = re.sub(r'\d+','1001',str3)
+ def add1(match):
+     ...:     val = match.group()
+     ...:     num = int(val) + 1
+     ...:     return str(num)
+re.sub(r'\d+',add1,str3)
+
+4.split(pattern,string,maxsplit=0,flags=0)根据匹配分割字符串，返回分割字符串组成的列表
+str4 = 'imooc:C C++ Java Python,C#'
+re.split(r':| |,',str4)
+
+五、练习
+抓取网页中的图片到本地
+1.抓取网页
+2.获取图片地址
+3.抓取图片内容到本地
+http://www.imooc.com/course/list?c=javascript
+
+
